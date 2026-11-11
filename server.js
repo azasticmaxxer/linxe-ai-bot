@@ -37,6 +37,7 @@ function loadConfig() {
             model: 'gemini-1.5-flash',
             customPrompt: ''
         },
+        whitelistOnly: false,
         whitelisted: [],
         blacklisted: ['120363426079472107@g.us', '918431546120']
     };
@@ -148,6 +149,7 @@ app.post('/api/whatsapp/start', async (req, res) => {
         botName: activeConfig.botName,
         mode: mode || activeConfig.mode,
         options: { ...activeConfig.options, ...(options || {}) },
+        whitelistOnly: activeConfig.whitelistOnly,
         whitelisted: activeConfig.whitelisted,
         blacklisted: activeConfig.blacklisted
     });

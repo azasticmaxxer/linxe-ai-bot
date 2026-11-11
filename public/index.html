@@ -165,6 +165,54 @@
                     </div>
                 </div>
 
+                <!-- Access Control: Whitelist & Blacklist (Easiest Way) -->
+                <div class="card access-card">
+                    <div class="card-header">
+                        <h3>🛡️ Access Control: Whitelist & Blacklist</h3>
+                        <span class="badge" id="accessBadge">All Contacts Mode</span>
+                    </div>
+                    <p class="card-description">The easiest way to control who the bot talks to. Type any phone number, name, or handle.</p>
+
+                    <div class="access-mode-toggle">
+                        <label class="toggle-container">
+                            <input type="checkbox" id="whitelistOnlyToggle" class="switch">
+                            <span><strong>Strict Whitelist Mode:</strong> Only reply to people on my Whitelist</span>
+                        </label>
+                    </div>
+
+                    <div class="access-columns">
+                        <!-- Whitelist Column -->
+                        <div class="access-col">
+                            <div class="access-col-header">
+                                <span class="badge-tag success">✅ Whitelist (Allowed)</span>
+                                <small>Auto-replies only to them</small>
+                            </div>
+                            <div class="add-chip-group">
+                                <input type="text" id="whitelistInput" placeholder="e.g. +91 99431 31705, Adhish">
+                                <button id="addWhitelistBtn" class="btn btn-sm btn-primary">➕ Add</button>
+                            </div>
+                            <div class="chips-container" id="whitelistChips">
+                                <!-- Chips dynamically inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Blacklist Column -->
+                        <div class="access-col">
+                            <div class="access-col-header">
+                                <span class="badge-tag danger">⛔ Blacklist (Muted)</span>
+                                <small>Dropped completely</small>
+                            </div>
+                            <div class="add-chip-group">
+                                <input type="text" id="blacklistInput" placeholder="e.g. +91 84315 46120, Team Android">
+                                <button id="addBlacklistBtn" class="btn btn-sm btn-danger">⛔ Mute</button>
+                            </div>
+                            <div class="chips-container" id="blacklistChips">
+                                <!-- Chips dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Platform Runners Card -->
                 <div class="card platforms-card">
                     <div class="card-header">

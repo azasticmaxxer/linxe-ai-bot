@@ -97,15 +97,45 @@ class WhatsAppBotManager {
                     const text = (msg.body || '').trim();
                     if (!text) return;
 
-                    // Blacklist check
-                    if (this.config.blacklisted && this.config.blacklisted.some(id => rawChatId.includes(id))) {
+                    let senderName = '';
+                    try {
+                        const contact = await msg.getContact();
+                        senderName = contact.pushname || contact.name || '';
+                    } catch (e) {}
+
+                    const authorId = msg.author || '';
+
+                    // Smart matching helper (checks phone numbers, names, handles, and group IDs)
+                    const checkMatches = (list) => {
+                        if (!list || !Array.isArray(list)) return false;
+                        return list.some(item => {
+                            if (!item) return false;
+                            const cleanItem = String(item).trim().toLowerCase();
+                            const itemDigits = cleanItem.replace(/\D/g, '');
+                            const chatDigits = rawChatId.replace(/\D/g, '');
+                            const authorDigits = authorId.replace(/\D/g, '');
+
+                            if (itemDigits.length >= 6) {
+                                if (chatDigits.endsWith(itemDigits) || itemDigits.endsWith(chatDigits)) return true;
+                                if (authorDigits && (authorDigits.endsWith(itemDigits) || itemDigits.endsWith(authorDigits))) return true;
+                            }
+                            if (rawChatId.toLowerCase().includes(cleanItem)) return true;
+                            if (authorId.toLowerCase().includes(cleanItem)) return true;
+                            if (senderName.toLowerCase().includes(cleanItem)) return true;
+                            return false;
+                        });
+                    };
+
+                    // Blacklist check: completely drop ignored people/groups
+                    if (checkMatches(this.config.blacklisted)) {
                         return;
                     }
 
-                    // Whitelist check (if whitelisted list is provided)
-                    if (this.config.whitelisted && this.config.whitelisted.length > 0) {
-                        const isWhitelisted = this.config.whitelisted.some(id => rawChatId.includes(id));
-                        if (!isWhitelisted) return;
+                    // Whitelist check: if whitelist is active, only reply to allowed people
+                    if (this.config.whitelistOnly && this.config.whitelisted && this.config.whitelisted.length > 0) {
+                        if (!checkMatches(this.config.whitelisted)) {
+                            return;
+                        }
                     }
 
                     this.log(`📩 Incoming from ${rawChatId}: "${text.slice(0, 40)}"`);

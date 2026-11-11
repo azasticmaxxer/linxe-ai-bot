@@ -41,6 +41,142 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopIgBtn = document.getElementById('stopIgBtn');
     const igStatusBadge = document.getElementById('igStatusBadge');
 
+    // Access Control Elements
+    const whitelistOnlyToggle = document.getElementById('whitelistOnlyToggle');
+    const accessBadge = document.getElementById('accessBadge');
+    const whitelistInput = document.getElementById('whitelistInput');
+    const addWhitelistBtn = document.getElementById('addWhitelistBtn');
+    const whitelistChips = document.getElementById('whitelistChips');
+    const blacklistInput = document.getElementById('blacklistInput');
+    const addBlacklistBtn = document.getElementById('addBlacklistBtn');
+    const blacklistChips = document.getElementById('blacklistChips');
+
+    let whitelisted = [];
+    let blacklisted = ['120363426079472107@g.us', '918431546120'];
+    let whitelistOnly = false;
+
+    // Fetch initial config from server
+    fetch('/api/status')
+        .then(res => res.json())
+        .then(data => {
+            if (data.config) {
+                if (data.config.whitelisted) whitelisted = data.config.whitelisted;
+                if (data.config.blacklisted) blacklisted = data.config.blacklisted;
+                if (data.config.whitelistOnly !== undefined) {
+                    whitelistOnly = data.config.whitelistOnly;
+                    whitelistOnlyToggle.checked = whitelistOnly;
+                    updateAccessBadge();
+                }
+                renderAccessChips();
+            }
+        })
+        .catch(() => {});
+
+    function updateAccessBadge() {
+        if (whitelistOnly) {
+            accessBadge.textContent = 'Strict Whitelist Only';
+            accessBadge.style.color = '#34d399';
+            accessBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        } else {
+            accessBadge.textContent = 'All Contacts Mode';
+            accessBadge.style.color = '#c7d2fe';
+            accessBadge.style.borderColor = 'var(--border-color)';
+        }
+    }
+
+    whitelistOnlyToggle.addEventListener('change', () => {
+        whitelistOnly = whitelistOnlyToggle.checked;
+        updateAccessBadge();
+        syncAccessConfig();
+        logToConsole(`Access mode changed: ${whitelistOnly ? 'Strict Whitelist Only' : 'All Contacts Allowed'}`);
+    });
+
+    function renderAccessChips() {
+        whitelistChips.innerHTML = '';
+        if (whitelisted.length === 0) {
+            whitelistChips.innerHTML = '<span style="font-size:0.75rem; color:#6b7280; padding:0.2rem;">(No numbers added - add anyone you want to auto-reply to)</span>';
+        } else {
+            whitelisted.forEach((item, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip whitelist-chip';
+                chip.innerHTML = `<span>${escapeHtml(item)}</span><button class="chip-remove" title="Remove" data-index="${index}">✖</button>`;
+                chip.querySelector('.chip-remove').addEventListener('click', () => {
+                    whitelisted.splice(index, 1);
+                    renderAccessChips();
+                    syncAccessConfig();
+                });
+                whitelistChips.appendChild(chip);
+            });
+        }
+
+        blacklistChips.innerHTML = '';
+        if (blacklisted.length === 0) {
+            blacklistChips.innerHTML = '<span style="font-size:0.75rem; color:#6b7280; padding:0.2rem;">(No numbers muted)</span>';
+        } else {
+            blacklisted.forEach((item, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip blacklist-chip';
+                chip.innerHTML = `<span>${escapeHtml(item)}</span><button class="chip-remove" title="Unblock" data-index="${index}">✖</button>`;
+                chip.querySelector('.chip-remove').addEventListener('click', () => {
+                    blacklisted.splice(index, 1);
+                    renderAccessChips();
+                    syncAccessConfig();
+                });
+                blacklistChips.appendChild(chip);
+            });
+        }
+    }
+
+    function syncAccessConfig() {
+        fetch('/api/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                whitelistOnly,
+                whitelisted,
+                blacklisted
+            })
+        }).catch(() => {});
+    }
+
+    addWhitelistBtn.addEventListener('click', () => {
+        const val = whitelistInput.value.trim();
+        if (val && !whitelisted.includes(val)) {
+            whitelisted.push(val);
+            whitelistInput.value = '';
+            renderAccessChips();
+            syncAccessConfig();
+            logToConsole(`Added to Whitelist: "${val}"`);
+        }
+    });
+    whitelistInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addWhitelistBtn.click();
+        }
+    });
+
+    addBlacklistBtn.addEventListener('click', () => {
+        const val = blacklistInput.value.trim();
+        if (val && !blacklisted.includes(val)) {
+            blacklisted.push(val);
+            blacklistInput.value = '';
+            renderAccessChips();
+            syncAccessConfig();
+            logToConsole(`Muted / Added to Blacklist: "${val}"`);
+        }
+    });
+    blacklistInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addBlacklistBtn.click();
+        }
+    });
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     // Restore saved state to inputs
     if (apiKey) {
         apiKeyInput.value = apiKey;
