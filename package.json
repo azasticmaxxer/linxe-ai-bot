@@ -1,0 +1,32 @@
+{
+  "name": "linxe-ai-bot",
+  "version": "1.0.0",
+  "description": "Multi-platform AI Bot Hub with Web Control Hub (WhatsApp, Instagram, Web Sandbox) powered by Google Gemini",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "ai-bot",
+    "whatsapp-bot",
+    "instagram-bot",
+    "gemini-ai",
+    "control-hub",
+    "uncensored",
+    "roast-bot"
+  ],
+  "author": "Linxe (https://www.instagram.com/linxedev/)",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "puppeteer": "^22.6.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}
