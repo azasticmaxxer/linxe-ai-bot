@@ -28,7 +28,7 @@ Never coded before? Don't worry! Everything is automated for you.
 ### Step 1: Download or Clone
 Click the green **`< > Code`** button above & select **Download ZIP** (or clone via Git):
 ```bash
-git clone https://github.com/randomchessmaster80-cmd/linxe-ai-bot.git
+git clone https://github.com/azasticmaxxer/linxe-ai-bot.git
 cd linxe-ai-bot
 ```
 
@@ -107,7 +107,7 @@ start.bat
 ```bash
 pkg update -y
 pkg install nodejs git -y
-git clone https://github.com/randomchessmaster80-cmd/linxe-ai-bot.git
+git clone https://github.com/azasticmaxxer/linxe-ai-bot.git
 cd linxe-ai-bot
 bash start.sh
 ```
